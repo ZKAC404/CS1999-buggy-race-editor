@@ -1,0 +1,9 @@
+@font-face {
+    font-family: "Sofia Pro";
+    font-weight: 400;
+    src: url("./Sofia-Pro-Regular-Az.4a12f316.woff2") format("woff2")
+}
+@font-face {
+    font-family: "Sofia Pro Bold";
+    src: url("./Sofia-Pro-Bold-Az.67b03dc7.woff2") format("woff2")
+}
