@@ -2,19 +2,163 @@
 
 {% block content %}
 
-  <h1>Buggy</h1>
+  	<h1 class="title" style="cursor: pointer" onclick="location.href = 'http:\/\/localhost:5000';">YOUR BUGGY</h1>
 
-  <table>
-    <tr>
-      <td>ID:</td> <td> {{ buggy['id'] }} </td>
-    </tr>
-    <tr>
-      <td>Wheels:</td> <td> {{ buggy['qty_wheels'] }} </td>
-    </tr>
-  </table>
+	{% if buggyId != "" %}
 
-  <p>
-    <a href="/" class="button">home</a>
-  </p>
+	<table>
+		{% for col in buggy %}
+			{% if (col["id"]|int) == (buggyId|int) %}
+				{% for data in col %}
+				<tr>
+					<td>{{ data }}</td> <td>{{ col[data] }}</td>
+				</tr>				
+				{% endfor %}
+			{% else %}
 
+			{% endif %}
+		{% endfor %}
+	</table>
+
+	<p>
+    	<a href="/buggy" class="button">BACK</a>
+  	</p>
+
+	{% else %}
+		{% for col in buggy %}
+		<div class="buggy_container">
+			<div onclick="selectBuggy({{ col['id'] }})" class="buggy_embed" id="{{ col['id'] }}">
+				<div class="canvas_container">
+                    <canvas class="canvas" id="buggy-{{ col['id'] }}" height="100px" width="100px"></canvas>
+                </div>
+				<img src="static/buggy_icon.png">
+				<a class="button">OPEN ID {{ col["id"] }}</a>
+				<form action="/buggy?delete={{ col['id'] }}">
+					<button type="submit" class="button" onclick="deleteBuggy({{ col['id'] }})">DELETE</a>
+				</form>
+			</div>
+		</div>
+		{% endfor %}
+	{% endif %}
+
+  	<p>
+    	<a href="/" class="button">HOME</a>
+  	</p>
+
+	  <script>
+		function selectBuggy(id) {
+			window.location = `http://localhost:5000/buggy?id=${id}`
+		}
+		function deleteBuggy(id) {
+			window.location = `http://localhost:5000/buggy?delete=${id}`
+		}
+
+        let buggy = "{{ buggy }}"
+		buggy = JSON.parse(buggy.replace(/&#39;/g, '"'))
+		console.log(buggy)
+
+		let ids = buggy.map(a => a["id"])
+
+        for (p = 0; p < ids.length; p++) {
+            // CANVAS
+            let c = document.getElementById(`buggy-${ids[p]}`);
+		    let ctx = c.getContext("2d");
+
+            ctx.fillStyle = buggy[p]["flag_color"]
+		    ctx.fillRect(0, 0, c.width, c.height);
+
+            if (buggy[p]["flag_pattern"] === "checker") {
+                let w = c.width;
+                let h = c.height;
+                ctx.fillStyle = buggy[p]["flag_color_secondary"]
+                nRow = 8;
+                nCol = 8;
+                w /= nCol;
+                h /= nRow;
+                for (var i = 0; i < nRow; ++i) {
+                    for (var j = 0, col = nCol / 2; j < col; ++j) {
+                        ctx.rect(2 * j * w + (i % 2 ? 0 : w), i * h, w, h);
+                    }
+                }
+                ctx.fill();
+            }
+            else if (buggy[p]["flag_pattern"] === "spot") {
+                ctx.fillStyle = buggy[p]["flag_color_secondary"]
+                ctx.beginPath();
+                let i = 1;
+                let j = 1;
+                for (j=1; j < 7; j++) {
+                    for (i=1; i < 7; i++) {
+                        var x = i * c.width/7;
+                        var y = j * c.height/7;
+
+                        ctx.moveTo( x + 2, y ); // This was the line you were looking for
+                        ctx.arc( x, y, 2, 0, Math.PI * 2 );
+                    }
+                }
+                ctx.stroke();
+                ctx.fill();
+            }
+            else if (buggy[p]["flag_pattern"] === "dstripe") {
+                ctx.fillStyle = buggy[p]["flag_color_secondary"]
+                const max = 15; // The number of stripes
+                let i = 0;
+                let x = 0;
+                let z = -180; // The incline of stripes
+
+                while (i < max) {
+                    // Draw diagonally top-right to bottom-left
+                    ctx.beginPath();
+                    ctx.moveTo(x, -5); // Start 10px above the top of the canvas to get around line caps
+                    ctx.lineTo(z, c.height + 5); // Finish 10px below the bottom of the canvas to get around line caps
+                    ctx.lineWidth = 3; // Stripe thickness
+                    ctx.strokeStyle = buggy[p]["flag_color_secondary"]
+                    ctx.stroke();
+                    x += 20; // Shift origin for start of next stripe
+                    z += 20; // Shift destination for end of next stripe
+                    i++;
+                }
+            }
+            else if (buggy[p]["flag_pattern"] === "vstripe") {
+                ctx.fillStyle = buggy[p]["flag_color_secondary"]
+                const max = 15; // The number of stripes
+                let i = 0;
+                let x = 0;
+                let z = 0; // The incline of stripes
+
+                while (i < max) {
+                    // Draw diagonally top-right to bottom-left
+                    ctx.beginPath();
+                    ctx.moveTo(x, -5); // Start 10px above the top of the canvas to get around line caps
+                    ctx.lineTo(x,c.height + 5); // Finish 10px below the bottom of the canvas to get around line caps
+                    ctx.lineWidth = 3; // Stripe thickness
+                    ctx.strokeStyle = buggy[p]["flag_color_secondary"]
+                    ctx.stroke();
+                    x += 10; // Shift origin for start of next stripe
+                    i++;
+                }
+            }
+            else if (buggy[p]["flag_pattern"] === "hstripe") {
+                ctx.fillStyle = buggy[p]["flag_color_secondary"]
+                const max = 15; // The number of stripes
+                let i = 0;
+                let x = 0;
+                let z = 0;
+
+                while (i < max) {
+                    // Draw diagonally top-right to bottom-left
+                    ctx.beginPath();
+                    ctx.moveTo(0, x);
+                    ctx.lineTo(c.width,z); 
+                    ctx.lineWidth = 3; // Stripe thickness
+                    ctx.strokeStyle = buggy[p]["flag_color_secondary"]
+                    ctx.stroke();
+                    x += 10
+                    z += 10
+                    i++;
+                }
+            }
+        }
+
+	</script>
 {% endblock %}

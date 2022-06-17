@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1 class="title" style="cursor: pointer" onclick="location.href = 'http:\/\/localhost:5000';">COSTS PAGE</h1>
+<p>
+    <table>
+        <tr>
+            <th>ITEM</th>
+            <th>COST</th>
+            <th>MASS</th>
+            <th>CONSUMABLE</th>
+            <th>DESCRIPTION</th>
+        </tr>
+        {% for col in cost %}
+        {% for row in cost[col] %}
+        <tr>
+            <td>{{row}}</td>
+            <td>{% if cost[col][row].cost is defined %} {{ cost[col][row].cost }} {% else %} 0 {% endif %}</td>
+            <td>{% if cost[col][row].mass is defined %} {{ cost[col][row].mass }} {% else %} 0 {% endif %}</td>
+            <td>{% if cost[col][row].consum is defined %} {{ cost[col][row].consum }} {% else %} n/a {% endif %}</td>
+            <td>{{ cost[col][row].desc }}</td>
+        </tr>
+        {%endfor%}
+        {% endfor %}
+    </table>
+</p>
+
+{% endblock %}

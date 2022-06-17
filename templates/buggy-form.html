@@ -2,16 +2,71 @@
 
 {% block content %}
 
-  <h1>Make buggy</h1>
+  	<h1 class="title" style="cursor: pointer" onclick="location.href = 'http:\/\/localhost:5000';">{{ "EDIT BUGGY" if data is defined else "MAKE BUGGY" }}</h1>
+  	<form class="edit_form" onsubmit="validateData(event)">
+    	{% for col in defaultData %}
+    	<div class="form_field">
+      		<label class="form_label" for={{ col }}>{{ col }}:</label>
+      		{% if typesData[col] is defined %}
+      		<select autocomplete="off" class="form_input_dropdown" id={{ col }}>
+				<option value="none">Select One</option>
+        		{% for value in typesData[col] %}
+        		<option {{ 'selected' if data and (data[col] == value) else "" }} value={{ value }}>{{ value }} - cost: {{ typesData[col][value].cost if typesData[col][value].cost is defined else 0 }}</option>
+				{% endfor %}
+      		</select>
+      		{% else %}
+      		<input class="form_input" id={{ col }} type="text" name={{ col }} value={{ data[col] if data is defined else "" }}>
+     		{% endif %}
+    	</div>
+    	{% endfor %}
+    	<input  placeholder="SUBMIT" type="submit" class="button">
+  	</form>
+  	<p class="errorMessage" id="errorMessage"></p>
+  	<p><a onclick="autofill()" class="button" >AUTO FILL</a></p>
+  	<p><a href="/" class="button">HOME</a></p>
 
-  <form action="/new" method="post">
-    <label for="qty_wheels">Number of wheels:</label>
-    <input type="text" name="qty_wheels" />
-    <input type="submit" class="button">
-  </form>
+  	<script>
+    	function validateData(event) {
+      		event.preventDefault();
+      
+      		let info = "{{defaultData}}"
+      		let data = JSON.parse(info.replace(/&#39;/g, '"').replace(/False/g, "false").replace(/None/g, "\"null\""))
 
-  <p>
-    <a href="/" class="button">home</a>
-  </p>
+			let allData = {}
+      		for (key in data) {
+        		if (event.target.elements[key].value === "") {
+          			return document.getElementById("errorMessage").innerText = `The ${key} field has been left empty!`
+        		}
+				else allData[key] = event.target.elements[key].value
+      		}
+
+      		if (!/^[4-99999]*$/.test(event.target.elements.qty_wheels.value) || event.target.elements.qty_wheels.value % 2 === 0 || event.target.elements.qty_wheels.value > event.target.elements.qty_tyres.value) return document.getElementById("errorMessage").innerText = "Invalid input! A number greater than 4 and less than 99999 must be entered"
+
+			fetch("/new", {
+				method: "POST",
+				headers: {'Content-Type': 'application/json'}, 
+				body: JSON.stringify(allData)
+			}).then(res => {
+				console.log("Request complete! response:", res);
+			});
+		}
+
+    	function autofill() {
+     		let info = "{{ defaultData }}";
+      		let data = JSON.parse(info.replace(/&#39;/g, '"').replace(/False/g, "false").replace(/None/g, "\"null\""))
+
+      		for (key in data) {
+        		if (document.getElementById(key).value === "") {
+          			document.getElementById(key).value = data[key]
+        		}
+      		}
+    	}
+  	</script>
+
+  <style>
+    .errorMessage {
+      color: red;
+    }
+  </style>
 
 {% endblock %}

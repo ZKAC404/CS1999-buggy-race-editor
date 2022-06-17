@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .cs1999-tasks {
+        border-top: 1px solid black;
+        margin-top: 4em;
+    }
+    .cs1999-tasks .task {
+        margin: 1em;
+        padding: 1em;
+        border: 1px solid black;
+    }
+    .cs1999-tasks .task h2 {
+        border-bottom: 3px solid gray;
+    }
+</style>
+
+<h1>POSTER</h1>
+<section class="cs1999-tasks">
+
+    <div class="task">
+      	<h2>0-GET Get the source code</h2>
+      	<p>I forked the repo on GitHub and then used <code>git clone</code> to make a local copy.</p>
+      	<p>
+        	Once the repo was on my own machine I was able to commit changes to version control
+        	as I went along, and I pushed back up to my GitHub repo at the end of each day.
+        	I followed GitHub's instructions and set up a SSH key so I didn't need to enter
+        	username and password every time I pushed.
+      	</p>
+    </div>
+
+    <div class="task">
+        <h2>0-RUN Get app running and view it in a browser</h2>
+        <p>I downloaded the requirements using the command <code>pip install -r requirements.txt</code> to install the listed requirements necessary for the flask application.</p>
+        <p>
+			Then to initialise the database I ran the command <code>python3 init_db.py</code> to create the SQL table "buggies", 
+			once that was complete I ran the command <code>python3 app.py</code> to get the flask server up and running on port 5000
+		</p>
+    </div>
+
+	<div class="task">
+		<h2>0-CHANGE Make a change to a template and see it appear</h2>
+		<p>After running the code I went into the <code>templates/index.html</code> file and edited a few lines for a smoke test.</p>
+		<p>I decided to also change the favicon, navbar title, and formatted the HTML code for easier readabilitiy.</p>
+	  </div>
+
+	<div class="task">
+		<h2>1-TEMPLATE Add a new template to the app</h2>
+		<p>Within the templates folder I created a file named info.html, I then headed to the project website to download the types data in json format, which I stored on the python flask application, fed to the HTML upon load, which was then mapped out into a table.</p>
+		<p>To keep data shown upto-date with the project server, I decided to fetch the types json data live on each page load, achieving this through the use of a module named "requests", through the function <code>requests.get("https://rhul.buggyrace.net/specs/data/types.json")</code> which is then turned a python object through the use of a module named "json", using the function <code>json.loads(data)</code> this data is passed into the template renderer on page load and is mapped into a table like before.</p>
+	</div>
+
+	<div class="task">
+		<h2>1-ADD Add more data to the form</h2>
+		<p>To do this I made a list of all the default data from the project website, and hard coded input fields onto the /new route which is then sent as a POST request to the Flask application through the form tag's action attribute</p>
+		<p>For a more dynamic and upto-date application I decided to fetch the defaults data live as well as the types data, mentioned before, then looping through all the default data elements, mapping them into input fields, and I turned those with a selection of predefined data into a dropdown list with the types data linked to it, to increase simplicity for the end user.</p>
+	</div>
+
+	<div class="task">
+		<h2>1-VALID Add basic data validation</h2>
+		<p>I added a JavaScript funtion within the <code>buggy-form.html</code> file to take the input fields data from the form as a parameter, and loop through all of it with its data-types in a list, confirming whether the inputted data is valid, removing the actions attribute from the form tag, and adding the onsubmit attribute, linking to the <code>validateData()</code> function</p>
+	</div>
+
+	<div class="task">
+		<h2>1-STYLE Style your editor just how you like it</h2>
+		<p>I decided to keep all css within a single file to maintain simplicity, and stuck to a grey/red overall theme, choosing colour shades that complement each other, and reduce eye strain.</p>
+	</div>
+
+	<div class="task">
+		<h2>2-EDIT Edit the record by loading its current values into the form</h2>
+		<p>When the <code>/edit</code> route is visited, the SQL database is searched for existing buggy data, then is passed onto the rendering template to auto-fill the data fields with the current data.</p>
+		<p>This however would create a conflict if the <code>/new</code> route was to be visited, displaying the current data within the form there too, therefore I added a condition based on the current page being visited, since the same Flask route is used for both.</p>
+	</div>
+
+	<div class="task">
+		<h2>2-FORM Make the form better</h2>
+		<p>I aligned the input fields in a column format, all being of the same width, height, and gap between each other. I also added labels describing what the input field is about to the left of the input fields. Upon clicking submit, the validation takes place, and if applicable an error is displayed at the end of the form next to the submit button in a red colour to indicate it's an error.</p>
+	</div>
+
+	<div class="task">
+		<h2>2-COST Calculate and save the game cost of the buggy</h2>
+		<p>Within the <code>init_db.py</code> file I edited a few lines of code to update the "buggies" table and add the "total_cost" column, giving it a data type of INTEGER with default value 0.</p>
+		<p>To keep upto-date data on costs, the cost data is fetched live from the project website, to ensure even if a change is made, it will automatically be displayed.</p>
+	</div>
+
+	<div class="task">
+		<h2>2-RULES Add validation according to the game rules</h2>
+		<p>I implemented client-side and server-side validation, on the client-side within the JavaScript function <code>validateData()</code> the data-types and gmae rules are validated.</p>
+	</div>
+
+	<div class="task">
+		<h2>3-ENV Switch between dev and production environments</h2>
+		<p>Within the main project folder I created a file named <code>.flaskenv</code> to hold environemnt variables securely, and added <code>FLASK_ENV=development</code> for the Flask application to run in devlopment mode with debugging turned on.</p>
+		<p>I also created a separate database for developement and production, using the <code>dotenv</code> module to fetch the data stored in the .flaskenv file, to check whether the application was in either development or production, and choose the database file accordingly.</p>
+	</div>
+
+	<div class="task">
+		<h2>3-AUTOFILL Add auto-fill to the edit forms</h2>
+		<p>I created a JavaScript function in the <code>buggy-form.html</code> file linking to a button, which when clicked fills in the input fields using the example data given on the project website, this button is only displayed on the /new route and not the /edit route.</p>
+	</div>
+
+	<div class="task">
+		<h2>3-MULTI Allow different buggies to be created</h2>
+		<p>I edited the SQL queries made on the Flask application from <code>fetchone()</code> to <code>fetchall()</code> so that all rows within the table is taken, each row being a buggy, this data is then manipulated into the correct data format for mapping onto the <code>/buggy</code> page, when loading onto the page, a choice is given on which buggy to select based on ID, upon clicking one, the JSON data is displayed in a table.</p>
+	</div>
+
+	<div class="task">
+		<h2>3-DEL Allow buggies to be deleted</h2>
+		<p>On the buggy selector page, I added a delete button, which when clicked, redirects the page to add <code>?delete=id</code> into the URL using JavaScript, which is then detected on the Flask application on the <code>/buggy</code> route, which makes an SQL query to delete a buggy with the given ID</p>
+	</div>
+
+	<div class="task">
+		<h2>3-FLAG Display the pennant graphically</h2>
+		<p>Using canvas, the buggies are looped through, fetching flag data, running through numerous if statements and mapping, to draw a pennant with the given design, which is then displayed on the top right of the buggy embed when selecting the buggy to display the JSON data for.</p>
+	</div>
+
+	<div class="task">
+		<h2>3-TESTS Write some tests</h2>
+		<p>I ran unit tests as I implemented the individual operations for each task, ensuring everything was functional and error-less. Overall I tried to make it as user and dummy friendly as possible and these unit tests proved this, in some cases it didn't go to plan, so after sometimes numerous debugging iterations everything was functional.</p>
+		<p></p>
+	</div>
+
+</section>
+
+{% endblock %}
